@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Repaint audit — SwingStructure vs. a deliberately repainting copy</title>
+<style>
+html, body { margin: 0; padding: 0; background: #0f1419; }
+body { color: #e6edf3; font-family: "Segoe UI", Tahoma, sans-serif; }
+.wrap { padding: 40px; width: 1360px; }
+h1 { font-size: 28px; font-weight: bold; margin: 0 0 6px 0; }
+.sub { font-size: 15px; color: #9aa4b2; margin: 0 0 20px 0; }
+.card { background: #161c24; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+.card h2 { font-size: 18px; margin: 0; }
+.badge { display: inline-block; border-radius: 6px; padding: 3px 10px; font-size: 13px;
+          font-weight: bold; color: #ffffff; margin-left: 10px; vertical-align: middle; }
+.ok { background: #1f6f43; }
+.bad { background: #8b2e2e; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+th { background: #1f2730; text-align: left; padding: 6px 10px; border-bottom: 1px solid #2a3340; }
+td { padding: 6px 10px; border-bottom: 1px solid #2a3340; }
+th.n, td.n { text-align: right; }
+.g { color: #2ecc71; }
+.r { color: #ff6b6b; font-weight: bold; }
+.note { font-size: 14px; color: #9aa4b2; margin: 0 0 14px 0; }
+footer { font-size: 13px; color: #6b7683; text-align: right; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Repaint audit — SwingStructure vs. a deliberately repainting copy</h1>
+<p class="sub">XAUUSD M15 · 2026-04-01 → 2026-10-27 · 13,566 bars · 37.8M real ticks · same harness, same InpStrength = 3 · only the indicator file differs</p>
+<div class="card">
+<h2>SwingStructure.mq5 (honest) <span class="badge ok">OVERALL: OK</span></h2>
+<table><thead><tr><th>buffer</th><th class="n">cells_observed</th><th class="n">late_fill_cells</th><th class="n">lag_min</th><th class="n">lag_median</th><th class="n">lag_max</th><th class="n">repaint_cells</th><th class="n">final_mismatch_cells</th><th class="n">verdict</th></tr></thead><tbody><tr><td>0 · swing high</td><td class="n">13566</td><td class="n">1300</td><td class="n">3</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>1 · swing low</td><td class="n">13566</td><td class="n">1282</td><td class="n">3</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>2 · reversal up</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>3 · reversal down</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>4 · structure</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr></tbody></table>
+</div>
+<div class="card">
+<h2>SwingStructure_RepaintDemo.mq5 (negative control) <span class="badge bad">OVERALL: REPAINTS (2 buffers)</span></h2>
+<table><thead><tr><th>buffer</th><th class="n">cells_observed</th><th class="n">late_fill_cells</th><th class="n">lag_min</th><th class="n">lag_median</th><th class="n">lag_max</th><th class="n">repaint_cells</th><th class="n">final_mismatch_cells</th><th class="n">verdict</th></tr></thead><tbody><tr><td>0 · swing high</td><td class="n">13566</td><td class="n">1532</td><td class="n">2</td><td class="n">2</td><td class="n">2</td><td class="n r">232</td><td class="n">0</td><td class="n r">REPAINTS</td></tr><tr><td>1 · swing low</td><td class="n">13566</td><td class="n">1510</td><td class="n">2</td><td class="n">2</td><td class="n">2</td><td class="n r">228</td><td class="n">0</td><td class="n r">REPAINTS</td></tr><tr><td>2 · reversal up</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>3 · reversal down</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr><tr><td>4 · structure</td><td class="n">13566</td><td class="n">0</td><td class="n">-</td><td class="n">-</td><td class="n">-</td><td class="n">0</td><td class="n">0</td><td class="n g">OK</td></tr></tbody></table>
+</div>
+<p class="note">late_fill = value appeared after the bar closed (expected lag for confirmed pivots) · repaint = a shown value changed or vanished · final_mismatch = last live value ≠ value after the run</p>
+<footer>github.com/krisorn01/mt5-swing-structure-audit · harness: RepaintAuditEA.mq5 + tools/repaint_report.py</footer>
+</div>
+</body>
+</html>
