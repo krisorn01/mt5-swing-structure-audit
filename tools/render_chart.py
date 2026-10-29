@@ -13,17 +13,17 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.lines import Line2D
 
-ROOT = Path(r"D:\Claude\Freelance\_Assets\Showcase\Code\mt5-swing-structure-audit")
+ROOT = Path(__file__).resolve().parents[1]
 IND_CSV = ROOT / "results" / "repaint_final_SwingStructure_honest.csv"
 RATES_CSV = ROOT / "results" / "xauusd_v_m15_window.csv"
-OUT_PNG = Path(r"D:\Claude\Freelance\_Assets\Portfolio\shots\swing_chart_rendered.png")
+OUT_PNG = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "results" / "swing_chart_rendered.png"
 SYMBOL = "XAUUSD.v"
 BG, FG = "#0b0e11", "#9aa4b2"
 UP, DN = "#26a69a", "#ef5350"
 WIN = 220
 
 # ---- (a)(b) read rates
-if not mt5.initialize(path=r"C:\Program Files\InterStellar MT5-1\terminal64.exe", timeout=90000):
+if not mt5.initialize(timeout=90000):  # uses the default/last MT5 terminal; pass path= if you have several
     print("initialize failed:", mt5.last_error())
     sys.exit(1)
 mt5.symbol_select(SYMBOL, True)
